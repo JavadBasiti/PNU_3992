@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reset airwork password</title>
+    <link rel="stylesheet" href="/static/w3.css">
+</head>
+<body>
+    <form th:action="@{/resetpass}" method="post" th:object="${newPassPage}">
+        <input type="text" hidden="true" th:field="*{hash}"/>
+        <input type="text" hidden="true" th:field="*{email}"/>
+        <h1 >New airwork password  </h1>
+        <br>
+        <br>
+        <label>Enter new password: </label> <input th:type="password" name="enterPass" th:field="*{newPass}" placeholder="pass"/>
+        <br>
+        <br>
+        <label>>Re enter password: </label><input th:type="password" name="reEnterpass" th:field="*{reNewPass}"  placeholder="ReEnter"/>
+        <br>
+        <br>
+        <div class="w3-panel w3-green"  th:text="*{msg}" th:if="*{msg}"></div>
+        <div class="w3-panel w3-yellow" th:text="*{error}" th:if="*{error}"></div>
+        <br>
+        <button th:type="submit">submit</button>
+    </form>
+
+</body>
+</html>

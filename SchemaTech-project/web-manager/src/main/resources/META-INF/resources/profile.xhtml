@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:adm="http://github.com/adminfaces"
+                template="/template.xhtml">
+    <ui:define name="metadata">
+        <ui:param name="title" value="User profile"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. -->
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: right !important;
+            }
+
+        </style>
+        <f:viewParam name="id" value="#{p:userPrincipal().name}" converter="javax.faces.Long"/>
+        <!-- use view action if you are in a Java EE 7 server: <f:viewAction action="#{carFormMB.init()}"/>-->
+<!--        <f:event type="preRenderView" listener="#{'.......'}"/>-->
+
+    </ui:define>
+
+    <ui:define name="description">
+        fill profile and CV...
+    </ui:define>
+
+
+    <ui:define name="body">
+        <h:form>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+
+                    <p:separator/>
+                    <div class="ui-g ui-fluid">
+
+                        <div class="ui-sm-12 ui-g-6 ui-g-nopad">
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:outputLabel for="email" value="Email"/>
+                            </div>
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:inputText id="email" required="true"
+                                             styleClass="form-control ui-state-disabled" style="width: 100%"/><!--value="#{carFormMB.car.id}"-->
+                                <span class="help-block">
+                                    <p:message for="email"/>
+                            </span>
+                            </div>
+                        </div>
+                        <div class="ui-sm-12 ui-g-6 ui-g-nopad">
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:outputLabel for="phoneNamber" value="Phone Namber"/>
+                            </div>
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:inputText id="phoneNamber" required="true"
+                                             styleClass="form-control ui-state-disabled" style="width: 100%"/><!--value="#{carFormMB.car.id}"-->
+                                <span class="help-block">
+                                    <p:message for="phoneNamber"/>
+                            </span>
+                            </div>
+                        </div>
+                        <div class="ui-sm-12 ui-g-6 ui-g-nopad">
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:outputLabel for="fName" value="First Name"/>
+                            </div>
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:inputText id="fName"
+                                             styleClass="form-control ui-state-disabled" style="width: 100%"/><!--value="#{carFormMB.car.id}"-->
+                                <span class="help-block">
+                                    <p:message for="fName"/>
+                            </span>
+                            </div>
+                        </div>
+                        <div class="ui-sm-12 ui-g-6 ui-g-nopad">
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:outputLabel value="Last Name" for="lName"/>
+                            </div>
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:inputText id="lName"  required="true"/><!--value="#{carFormMB.car.model}"-->
+                                <span class="help-block">
+                                <p:message for="lName"/>
+                            </span>
+                            </div>
+                        </div>
+                        <div class="ui-sm-12 ui-g-6 ui-g-nopad">
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:outputLabel value="CV" for="cv"/>
+                            </div>
+                            <div class="ui-sm-12 ui-g-11">
+                                <p:inputTextarea id="cv"  required="true"/><!--value="#{carFormMB.car.name}"-->
+                                <span class="help-block">
+                                <p:message for="cv"/>
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+                    <p:separator/>
+                    <h:panelGroup>
+                        <p:spacer width="5"/>
+                        <p:commandButton value="Save" update="@(.ui-dialog)" styleClass="btn-info"
+                                         icon="fa fa-search"/><!--oncomplete="PF('selectedCars').show()"-->
+
+
+                    </h:panelGroup>
+                    <h:panelGroup id="footer" layout="block" styleClass="hidden-sm hidden-md hidden-lg">
+                    <hr/>
+                        <p:splitButton value="Save"  update="@form"
+                                       icon="fa fa-check"
+                                       styleClass="hidden-md hidden-lg btn-primary"><!--action="#{carFormMB.save}"-->
+                            <p:menuitem value="Reset"
+                                        process="@this" update="@form"
+                                        resetValues="true" icon="fa fa-refresh"/><!--action="#{carFormMB.clear}" rendered="#{carFormMB.isNew()}"-->
+                            <p:menuitem value="Delete" process="@this"
+                                         icon="fa fa-trash"><!--action="#{carFormMB.remove}" rendered="#{not carFormMB.isNew()}"-->
+                                <f:setPropertyActionListener value="true"
+                                                             target="#{facesContext.externalContext.flash.keepMessages}"/>
+                                <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-danger"/>
+                            </p:menuitem>
+                            <p:separator/>
+                            <p:menuitem value="Back"
+                                        process="@this" immediate="true"
+                                        icon="fa fa-reply"/><!--action="car-list?faces-redirect=true"-->
+                        </p:splitButton>
+                    </h:panelGroup>
+                    <p:separator/>
+
+
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,860 @@
+openapi: 3.0.0
+info:
+  description: >-
+    [SchemaTek](https://www.schematech.org) api documentations.
+    for the authorization and api-keys please send an email to
+    `info@schematech.org`
+  version: 0.1.0
+  title: SchemaTek
+  termsOfService: 'https://www.schematech.org/terms/'
+  contact:
+    email: basiti@schematech.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'https://api-us-schematech.herokuapp.com'
+  - url: 'http://api.schematech.org'
+tags:
+  - name: IAT
+    description: Implemented and tested APIs
+  - name: INT
+    description: Implemented but not tested APIs
+  - name: NI
+    description: Not implemented
+  - name: USER
+    description: Manage a user account
+  - name: CHAT
+  - name: THERAPIST
+
+paths:
+  '/oauth/token':
+    post:
+      summary: user default login method
+      tags:
+        - USER
+        - IAT
+      security:
+        - OAuth2: [read, write]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                  description: uses for login type one
+                password:
+                  type: string
+                  description: uses for login type one
+      responses:
+        '200':
+          description: login completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AthorizationResponse"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/oauth/token{type}':
+    post:
+      summary: user default login method (call after /user/phoneLogin service) type empty variable to skip OpenAPI
+      tags:
+        - USER
+        - IAT
+      security:
+        - OAuth2: [read, write]
+      parameters:
+        - name: type
+          in: path
+          description: empty variable to skip OpenAPI
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                phoneNumber:
+                  type: integer
+                  description: uses for login type two
+                countryCode:
+                  type: integer
+                  description: uses for login type two
+                verificationCode:
+                  type: string
+                  description: uses for login type two
+      responses:
+        '200':
+          description: login completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AthorizationResponse"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user/phoneLogin':
+    post:
+      description: login with phone number. Also, This service can use for the resending verification code.
+      tags:
+        - USER
+        - IAT
+      parameters:
+        - name: clientId
+          in: header
+          description: Client Application Id
+          required: true
+          schema:
+            type: string
+        - name: clientSecret
+          in: header
+          description: Client Application Secret password
+          required: true
+          schema:
+            type: string
+        - name: phoneNumber
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: countryCode
+          in: query
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        '200':
+          description: verification code successfully sent to user, you may consider to calling /user/token with three parameter (phoneNumber, countryCode, verificationCode) service.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user/forgetPassword':
+    post:
+      description: user forget password
+      tags:
+        - USER
+        - INT
+      parameters:
+        - name: clientId
+          in: header
+          description: Client Application Id
+          required: true
+          schema:
+            type: string
+        - name: clientSecret
+          in: header
+          description: Client Application Secret password
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: forget password successfully completed. User will receive an email to change the password from the web.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user':
+    post:
+      description: Register new user
+      tags:
+        - USER
+        - IAT
+      parameters:
+        - name: clientId
+          in: header
+          description: Client Application Id
+          required: true
+          schema:
+            type: string
+        - name: clientSecret
+          in: header
+          description: Client Application Secret password
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Register new user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserModify'
+      responses:
+        '200':
+          description: registration completed. verification code successfully sent to user, you may consider to calling /oauth/token{type} service and, call /user/phoneLogin to resend the verification code.
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    get:
+      summary: get current user info
+      description: get profile info
+      tags:
+        - USER
+        - INT
+      security:
+        - OAuth2: [read]
+      responses:
+        '200':
+          description: user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - USER
+        - INT
+      description: update user info
+      security:
+        - OAuth2: [write]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserModify'
+      responses:
+        '204':
+          description: user info successfully updated
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user/changePassword/':
+    post:
+      description: change user password
+      tags:
+        - USER
+        - INT
+      security:
+        - OAuth2: [write]
+      requestBody:
+        description: Register new user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+      responses:
+        '204':
+          description: user's password completely changed
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user/verifyMail':
+    post:
+      tags:
+        - USER
+        - INT
+      security:
+        - OAuth2: [read]
+      description: verifying user email address before editing user info
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+      responses:
+        '204':
+          description: email address is valid for change
+        default:
+          description: invalid email address or exist email address check error message for detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user/updateAvatar':
+    post:
+      tags:
+        - USER
+        - INT
+      security:
+        - OAuth2: [write]
+      description: upload user avatar and delete old one if exist
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: avatar uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Media"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user/{id}/profile':
+    get:
+      summary: get other user info
+      description: to get profile info
+      tags:
+        - USER
+        - INT
+      security:
+        - OAuth2: [read]
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to fetch
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicUser"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user/{id}/therapistRegister':
+    post:
+      tags:
+        - USER
+        - INT
+      security:
+        - OAuth2: [write]
+      parameters:
+        - name: id
+          in: path
+          description: ID of user to fetch
+          required: true
+          schema:
+            type: integer
+      description: Apply to become a therapist. Use this service just for the normals user.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                CV:
+                  type: string
+      responses:
+        '200':
+          description: application successfully submited, and therapist profile will be activated after review
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/user/{id}/rateToTherapist':
+    post:
+      tags:
+        - USER
+        - NI
+      security:
+        - OAuth2: [write]
+      parameters:
+        - name: id
+          in: path
+          description: ID of the job
+          required: true
+          schema:
+            type: integer
+      description: UI (Handyman - Rate to the handyman)<br>Check for these steps in the back-end before submitting:<br>1. Check job status, should be WORKER_DON or FINAL.<br>2. Change Job status to the FINAL <br>3. <b>If user does not rated to the worker, system automaticlly will be change the job status to the FINAL after 24 hours, And payment will be processing on Job Done status.</b><br>4. rate should be between 1 and 5.<br>5. Calculate average rate of the worker and number of the rates on worker profile.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                rate:
+                  type: integer
+                  description: should be between 1 and 5
+                review:
+                  type: string
+      responses:
+        '200':
+          description: cancelation request submitted
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/questionnaire/answers':
+    post:
+      tags:
+        - Questionnaire
+        - INT
+      security:
+        - OAuth2: [write]
+      description: post answers for Questionnaire code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                questionnaireCode:
+                  type: string
+                answers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Answer"
+
+      responses:
+        '200':
+          description: succsses saved
+        default:
+          description: An error occurred, message for detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/questionnaire/{userId}/{qCode}':
+    get:
+      summary: to get Questionnaire answers
+      tags:
+        - Questionnaire
+        - INT
+      security:
+        - OAuth2: [read]
+      parameters:
+        - name: userId
+          in: path
+          description: Id of the user
+          required: true
+          schema:
+            type: integer
+        - name: qCode
+          in: path
+          description: code of the Questionnaire
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: succsses saved
+          content:
+            application/json:
+              schema:
+                properties:
+                  answers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Answer"
+        default:
+          description: An error occurred, message for detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/therapist/list':
+    get:
+      tags:
+        - THERAPIST
+        - INT
+      security:
+        - OAuth2: [read]
+      description: use this service to get list of therapist
+      responses:
+        '200':
+          description: return therapist lists
+          content:
+            application/json:
+              schema:
+                properties:
+                  therapistes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Therapist"
+
+
+  '/chat/{id}/{page}':
+    get:
+      tags:
+        - CHAT
+        - NI
+      security:
+        - OAuth2: [read]
+      description: use this service to open chat for both users and workers
+      parameters:
+        - name: id
+          in: path
+          description: ID of the job
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: path
+          description: default set to 0 to load latest conversations, set to higher numbers to load previous conversations
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: return chat detail and conversation lists
+          content:
+            application/json:
+              schema:
+                properties:
+                  chat:
+                    $ref: "#/components/schemas/Chat"
+        default:
+          description: invalid request check error message for the details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  '/chat/{id}/newMessage':
+    put:
+      tags:
+        - CHAT
+        - NI
+      security:
+        - OAuth2: [write]
+      description: use this service to send a message
+      parameters:
+        - name: id
+          in: path
+          description: ID of the job
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                jobId:
+                  type: integer
+                messageType:
+                  $ref: "#/components/schemas/ChatType"
+                message:
+                  type: string
+                media:
+                  type: string
+                  format: binary
+      responses:
+        '204':
+          description: The message successfully sent
+        default:
+          description: invalid request check error message for the details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description: for example 'Authorization=Basic Y2xpZW50dXNlcjpwYXNzd29yZA==' the base64 is clientUser:clientPassword
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/authorize
+          tokenUrl: /oauth/token
+          scopes:
+            read: Grants read access for public users/worker
+            write: Grants write access for public users/worker
+            admin: Grants access to admin operations
+  schemas:
+    AthorizationResponse:
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+        scope:
+          type: string
+
+    Media:
+      properties:
+        smallThumbUrl:
+          type: string
+        mediumThumbUrl:
+          type: string
+        largeThumbUrl:
+          type: string
+        mediaUrl:
+          type: string
+        mimeType:
+          type: string
+        width:
+          type: integer
+        height:
+          type: integer
+
+    User:
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthDate:
+          type: integer
+          format: int64
+          description: epoch time
+        gender:
+          $ref: '#/components/schemas/GenderType'
+        email:
+          type: string
+        countryCode:
+          type: integer
+        phoneNumber:
+          type: integer
+        avatar:
+          $ref: '#/components/schemas/Media'
+        isTherapist:
+          type: boolean
+        address:
+          type: string
+        therapist:
+          $ref: '#/components/schemas/PublicUser'
+
+
+    PublicUser:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        avatar:
+          $ref: '#/components/schemas/Media'
+        isTherapist:
+          type: boolean
+        memberFrom:
+          type: integer
+          format: int64
+          description: epoch time
+        jobsPostedNo:
+          type: integer
+        jobsDoneNo:
+          type: integer
+        reviewsNo:
+          type: integer
+
+
+    UserModify:
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthDate:
+          type: integer
+          format: int64
+          description: epoch time
+        gender:
+          $ref: '#/components/schemas/GenderType'
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        countryCode:
+          type: integer
+        password:
+          type: string
+        address:
+          type: string
+        therapistId:
+          type: integer
+
+    ChangePassword:
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+
+    GenderType:
+      type: string
+      enum:
+        - bisexual
+        - male
+        - female
+      description: gender
+
+    Review:
+      properties:
+        id:
+          type: integer
+        rate:
+          type: integer
+        review:
+          type: string
+        user:
+          $ref: '#/components/schemas/PublicUser'
+        date:
+          type: integer
+          format: int64
+          description: epoch time
+
+    ChatType:
+      type: string
+      enum:
+        - TEXT
+        - IMAGE
+        - VOICE
+        - VIDEO
+        - RESCHEDULE_REQUEST
+        - RESCHEDULE_ACCEPTED
+        - RESCHEDULE_REJECTED
+      description: TEXT | IMAGE | VOICE | VIDEO | RESCHEDULE_REQUEST | RESCHEDULE_ACCEPTED | RESCHEDULE_REJECTED
+
+    ChatConversation:
+      properties:
+        id:
+          type: integer
+        from:
+          type: integer
+        to:
+          type: integer
+        messageType:
+          $ref: "#/components/schemas/ChatType"
+        message:
+          type: string
+        media:
+          $ref: "#/components/schemas/Media"
+        time:
+          type: integer
+          format: int64
+          description: epoch time
+        seenTime:
+          type: integer
+          format: int64
+          description: epoch time
+
+    Chat:
+      properties:
+        lastConversationTime:
+          type: integer
+          format: int64
+          description: epoch time
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatConversation"
+        rescheduleDate:
+          type: integer
+          format: int64
+          description: epoch time
+        conformedByUser:
+          type: boolean
+        confirmedByWorker:
+          type: boolean
+
+    Pagination:
+      properties:
+        currentPage:
+          type: integer
+        paginationLimit:
+          type: integer
+
+    Error:
+      required:
+        - timestamp
+        - message
+      properties:
+        timestamp:
+          type: number
+          format: int64
+        status:
+          type: integer
+        error:
+          type: string
+          format: int32
+        message:
+          type: string
+        path:
+          type: string
+
+    Answer:
+      properties:
+        questionNo:
+          type: integer
+        answer:
+          type: integer
+
+    Therapist:
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        cv:
+          type: string

@@ -1,0 +1,54 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.2'
+	id 'org.joinfaces' version '4.4.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'org.schematech'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+//	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.joinfaces:jsf-spring-boot-starter'
+	implementation 'org.joinfaces:adminfaces-spring-boot-starter'
+	implementation 'javax.servlet:jstl:1.2'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+//    implementation 'org.springframework.boot:spring-boot-starter-web'
+//    compile group: 'org.springframework.security.oauth.boot', name: 'spring-security-oauth2-autoconfigure', version: '2.4.0'
+
+//    implementation "com.stripe:stripe-java:20.19.0"
+//    implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.X')
+//    implementation 'com.amazonaws:aws-java-sdk-s3'
+    implementation 'net.coobird:thumbnailator:0.4.11'
+
+    runtime "mysql:mysql-connector-java:8.0.23"
+
+    implementation group: "com.twilio.sdk", name: "twilio", version: "7.45.+"
+    implementation group: "com.sparkjava", name: "spark-core", version: "2.7.1"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+	useJUnitPlatform()
+}

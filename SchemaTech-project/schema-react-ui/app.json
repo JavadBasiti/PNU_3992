@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "Schematech",
+    "slug": "schematech",
+    "version": "1.0.6",
+    "orientation": "portrait",
+    "icon": "./src/assets/images/icon.png",
+    "splash": {
+      "image": "./src/assets/images/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.barshid.schematech",
+      "versionCode": 2
+    },
+    "web": {
+      "favicon": "./src/assets/images/favicon.png"
+    },
+    "description": "Schematech Will Try to help you to have Better Life",
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "barshid",
+            "project": "schematech",
+            "authToken": "574804e777ac4bb681cf7cfc9e01f99b1418bc7f815544cd8b8adfb1f41c5901"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:adm="http://github.com/adminfaces"
+                template="/template.xhtml">
+    <ui:define name="metadata">
+        <ui:param name="title" value="Result questions"/> <!-- Automatic create breadCrumb and page title when param 'title' is provided. -->
+        <style type="text/css">
+            .ui-datatable .ui-datatable-header {
+                text-align: right !important;
+            }
+
+        </style>
+        <f:viewParam name="id" value="#{p:userPrincipal().name}" converter="javax.faces.Long"/>
+        <!-- use view action if you are in a Java EE 7 server: <f:viewAction action="#{carFormMB.init()}"/>-->
+        <!--        <f:event type="preRenderView" listener="#{'.......'}"/>-->
+
+    </ui:define>
+
+    <ui:define name="description">
+        questionnaire: Result Page
+    </ui:define>
+
+
+    <ui:define name="body">
+        <p:dataTable id="tblSales" var="sale" value="#{dtGroupView.sales}">
+            <f:facet name="header">
+                <h:outputText value="Product Sales"/>
+            </f:facet>
+
+            <p:columnGroup type="header">
+                <p:row>
+                    <p:column rowspan="3" headerText="Product"/>
+                    <p:column colspan="4" headerText="Sale Rate"/>
+                </p:row>
+                <p:row>
+                    <p:column colspan="2" headerText="Sales"/>
+                    <p:column colspan="2" headerText="Profit"/>
+                </p:row>
+                <p:row>
+                    <p:column headerText="Last Year"/>
+                    <p:column headerText="This Year"/>
+                    <p:column headerText="Last Year"/>
+                    <p:column headerText="This Year"/>
+                </p:row>
+            </p:columnGroup>
+
+            <p:column>
+                <h:outputText value="#{sale.manufacturer}"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{sale.lastYearProfit}%"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{sale.thisYearProfit}%"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{sale.lastYearSale}">
+                    <f:convertNumber type="currency" currencySymbol="$"/>
+                </h:outputText>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{sale.thisYearSale}">
+                    <f:convertNumber type="currency" currencySymbol="$"/>
+                </h:outputText>
+            </p:column>
+
+            <p:columnGroup type="footer">
+                <p:row>
+                    <p:column colspan="3" style="text-align:right" footerText="Totals:"/>
+                    <p:column style="text-align:left" footerText="$#{dtGroupView.lastYearTotal}"/>
+                    <p:column style="text-align:left" footerText="$#{dtGroupView.thisYearTotal}"/>
+                </p:row>
+            </p:columnGroup>
+
+            <f:facet name="footer">
+                <h:outputText value="Data between 2013-2014"/>
+            </f:facet>
+        </p:dataTable>
+
+    </ui:define>
+</ui:composition>
